@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -30,5 +32,16 @@ public class HomeController {
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
         return "users";
+    }
+    @GetMapping("/signup")
+    public String signup(Model model) {
+        model.addAttribute("users", new User());
+        return "inscription";
+
+    }
+    @PostMapping("/signup")
+    public String signup(@ModelAttribute("user") User user) {
+        userRepository.save(user);
+        return "redirect:/connexion";
     }
 }
