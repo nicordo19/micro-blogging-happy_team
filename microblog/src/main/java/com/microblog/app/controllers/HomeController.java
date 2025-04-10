@@ -30,12 +30,12 @@ public class HomeController {
     @GetMapping("/users")
     public String getAllUsers(Model model) {
         List<User> users = userRepository.findAll();
-        model.addAttribute("users", users);
+        model.addAttribute("user", users);
         return "users";
     }
     @GetMapping("/signup")
     public String signup(Model model) {
-        model.addAttribute("users", new User());
+        model.addAttribute("user", new User());
         return "inscription";
 
     }
@@ -44,4 +44,23 @@ public class HomeController {
         userRepository.save(user);
         return "redirect:/connexion";
     }
+    @GetMapping("/connexion")
+    public String showLoginForm(Model model){
+        model.addAttribute("user", new User());
+        return "connexion";
+    }
+    @PostMapping("/connexion")
+    public String processLogin(@ModelAttribute("user") User user, Model model) {
+        User existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            // ✅ Connexion réussie (mot de passe en clair ici)
+            return "redirect:/"; // page d’accueil après connexion
+        }
+
+        // ❌ Email ou mot de passe incorrect
+        model.addAttribute("error", "Identifiants incorrects");
+        return "connexion";
+    }
+
 }
