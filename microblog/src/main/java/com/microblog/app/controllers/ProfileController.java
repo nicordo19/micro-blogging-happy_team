@@ -1,9 +1,10 @@
 package com.microblog.app.controllers;
-
+import jakarta.servlet.http.HttpSession;
 import com.microblog.app.repositories.UserRepository;
 import com.microblog.app.models.User;
 import com.microblog.app.repositories.PostRepository;
 import com.microblog.app.models.Post;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,9 @@ public class ProfileController {
     }
 
     @GetMapping("/profile/{user_id}")
-    public String profile(@PathVariable Long user_id, Model model) {
+    public String profile(@PathVariable Long user_id, Model model, HttpSession session) {
+
+
         User user = userRepository.findById(user_id).orElseThrow(() -> new RuntimeException("User not found!"));
         List<Post> posts = postRepository.findByUserOrderByCreatedAtDesc(user);
         model.addAttribute("user", user);

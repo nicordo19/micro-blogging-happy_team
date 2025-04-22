@@ -1,4 +1,7 @@
 package com.microblog.app.controllers;
+import com.microblog.app.repositories.PostRepository;
+import com.microblog.app.models.Post;
+
 
 import com.microblog.app.models.User;
 import com.microblog.app.repositories.UserRepository;
@@ -16,27 +19,37 @@ import java.util.List;
 public class HomeController {
 
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+
 
     @Autowired
-    public HomeController(UserRepository userRepository) {
+    public HomeController(UserRepository userRepository,PostRepository postRepository) {
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @GetMapping("/")
     public String home(HttpSession session,Model model) {
         User user = (User) session.getAttribute("loggedUser");
-
+        model.addAttribute("username", user != null ? user.getUsername() : "Invité");
+        model.addAttribute("avatar", user != null ? user.getAvatar() : "/uploads/default-avatar.png");
+        model.addAttribute("userId", user != null ? user.getId() : 0);
+        model.addAttribute("message", "Hello Ada Tech 🚀");
         if (user != null) {
             model.addAttribute("username", user.getUsername());
         } else {
             model.addAttribute("username", "Invité");
         }
+        List<Post> posts = postRepository.findAll();
+        model.addAttribute("posts", posts);
+
         model.addAttribute("message", "Hello Ada Tech 🚀");
         return "home";
     }
 
     @GetMapping("/users")
     public String getAllUsers(Model model) {
+
         List<User> users = userRepository.findAll();
         model.addAttribute("user", users);
         return "users";
