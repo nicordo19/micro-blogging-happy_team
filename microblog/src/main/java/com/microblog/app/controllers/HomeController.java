@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -22,7 +23,14 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(HttpSession session,Model model) {
+        User user = (User) session.getAttribute("loggedUser");
+
+        if (user != null) {
+            model.addAttribute("username", user.getUsername());
+        } else {
+            model.addAttribute("username", "Invité");
+        }
         model.addAttribute("message", "Hello Ada Tech 🚀");
         return "home";
     }
@@ -50,11 +58,12 @@ public class HomeController {
         return "connexion";
     }
     @PostMapping("/connexion")
-    public String processLogin(@ModelAttribute("user") User user, Model model) {
+    public String processLogin(@ModelAttribute("user") User user, Model model,HttpSession session) {
         User existingUser = userRepository.findByEmail(user.getEmail());
 
         if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
             // ✅ Connexion réussie (mot de passe en clair ici)
+            session.setAttribute("loggedUser", existingUser);
             return "redirect:/"; // page d’accueil après connexion
         }
 
